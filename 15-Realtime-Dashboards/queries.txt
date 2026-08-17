@@ -1,0 +1,65 @@
+- Create a real-time dashboard
+
+1.
+
+ bikes
+     | where ingestion_time() between (ago(30min) .. now())
+     | summarize latest_observation = arg_max(ingestion_time(), *) by Neighbourhood
+     | project Neighbourhood, latest_observation, No_Bikes, No_Empty_Docks
+     | order by Neighbourhood asc
+
+2.
+
+ bikes
+     | where ingestion_time() between (ago(30min) .. now())
+     | summarize latest_observation = arg_max(ingestion_time(), *) by Neighbourhood
+     | project Neighbourhood, latest_observation, Latitude, Longitude, No_Bikes
+     | order by Neighbourhood asc
+
+
+3.
+
+ bikes
+     | where ingestion_time() between (ago(30min) .. now())
+     | summarize latest_observation = arg_max(ingestion_time(), *) by Neighbourhood
+
+
+4.
+
+ base_bike_data
+ | project Neighbourhood, latest_observation, No_Bikes, No_Empty_Docks
+ | order by Neighbourhood asc
+
+
+5.
+
+ base_bike_data
+ | project Neighbourhood, latest_observation, No_Bikes, Latitude, Longitude
+ | order by Neighbourhood asc
+
+
+- Add a parameter
+
+1.
+
+  bikes
+  | distinct Neighbourhood
+  | order by Neighbourhood asc
+
+2.
+
+ bikes
+     | where ingestion_time() between (ago(30min) .. now())
+       and (isempty(['selected_neighbourhoods']) or Neighbourhood  in (['selected_neighbourhoods']))
+     | summarize latest_observation = arg_max(ingestion_time(), *) by Neighbourhood
+
+
+
+- Add a page
+
+
+1.
+
+ base_bike_data
+ | project Neighbourhood, latest_observation
+ | order by latest_observation desc
