@@ -1,0 +1,139 @@
+- Retrieve data from a table with KQL
+
+1.  
+
+ Bikestream
+ | take 100
+
+2. 
+
+// Use 'project' and 'take' to view a sample number of records in the table and check the data.
+ Bikestream
+ | project Street, No_Bikes
+ | take 10
+
+3.
+
+ Bikestream 
+ | project Street, ["Number of Empty Docks"] = No_Empty_Docks
+ | take 10
+
+
+
+- Summarize data by using KQL
+
+1. 
+
+
+ Bikestream
+ | summarize ["Total Number of Bikes"] = sum(No_Bikes)
+
+2. 
+
+ Bikestream
+ | summarize ["Total Number of Bikes"] = sum(No_Bikes) by Neighbourhood
+ | project Neighbourhood, ["Total Number of Bikes"]
+
+3. 
+
+ Bikestream
+ | summarize ["Total Number of Bikes"] = sum(No_Bikes) by Neighbourhood
+ | project Neighbourhood = case(isempty(Neighbourhood) or isnull(Neighbourhood), "Unidentified", Neighbourhood), ["Total Number of Bikes"]
+
+
+- Sort data by using KQL
+
+
+1.
+
+ Bikestream
+ | summarize ["Total Number of Bikes"] = sum(No_Bikes) by Neighbourhood
+ | project Neighbourhood = case(isempty(Neighbourhood) or isnull(Neighbourhood), "Unidentified", Neighbourhood), ["Total Number of Bikes"]
+ | sort by Neighbourhood asc
+
+
+2. 
+
+ Bikestream
+ | summarize ["Total Number of Bikes"] = sum(No_Bikes) by Neighbourhood
+ | project Neighbourhood = case(isempty(Neighbourhood) or isnull(Neighbourhood), "Unidentified", Neighbourhood), ["Total Number of Bikes"]
+ | order by Neighbourhood asc
+
+
+- Filter data by using KQL 
+
+
+1.
+
+ Bikestream
+ | where Neighbourhood == "Chelsea"
+ | summarize ["Total Number of Bikes"] = sum(No_Bikes) by Neighbourhood
+ | project Neighbourhood = case(isempty(Neighbourhood) or isnull(Neighbourhood), "Unidentified", Neighbourhood), ["Total Number of Bikes"]
+ | sort by Neighbourhood asc
+
+
+
+= Query data by using Transact-SQL
+
+- Summarize data by using Transact-SQL
+
+
+1. 
+
+ SELECT sum(No_Bikes) AS [Total Number of Bikes]
+ FROM Bikestream
+
+2.
+
+ SELECT Neighbourhood, Sum(No_Bikes) AS [Total Number of Bikes]
+ FROM Bikestream
+ GROUP BY Neighbourhood
+
+
+3. 
+
+ SELECT CASE
+          WHEN Neighbourhood IS NULL OR Neighbourhood = '' THEN 'Unidentified'
+          ELSE Neighbourhood
+        END AS Neighbourhood,
+        SUM(No_Bikes) AS [Total Number of Bikes]
+ FROM Bikestream
+ GROUP BY CASE
+            WHEN Neighbourhood IS NULL OR Neighbourhood = '' THEN 'Unidentified'
+            ELSE Neighbourhood
+          END;
+
+
+- Sort data by using Transact-SQL
+
+
+1.
+
+ SELECT CASE
+          WHEN Neighbourhood IS NULL OR Neighbourhood = '' THEN 'Unidentified'
+          ELSE Neighbourhood
+        END AS Neighbourhood,
+        SUM(No_Bikes) AS [Total Number of Bikes]
+ FROM Bikestream
+ GROUP BY CASE
+            WHEN Neighbourhood IS NULL OR Neighbourhood = '' THEN 'Unidentified'
+            ELSE Neighbourhood
+          END
+ ORDER BY Neighbourhood ASC;
+
+
+- Filter data by using Transact-SQL
+
+
+ SELECT CASE
+          WHEN Neighbourhood IS NULL OR Neighbourhood = '' THEN 'Unidentified'
+          ELSE Neighbourhood
+        END AS Neighbourhood,
+        SUM(No_Bikes) AS [Total Number of Bikes]
+ FROM Bikestream
+ GROUP BY CASE
+            WHEN Neighbourhood IS NULL OR Neighbourhood = '' THEN 'Unidentified'
+            ELSE Neighbourhood
+          END
+ HAVING Neighbourhood = 'Chelsea'
+ ORDER BY Neighbourhood ASC;
